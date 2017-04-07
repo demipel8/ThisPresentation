@@ -31,3 +31,20 @@ var event = new Event('pulse_button');
 document.addEventListener('pulse_button', Doorbell.press);
 document.dispatchEvent(event);
 ```
+
+##Itself
+```js
+	function counter() {
+	  this.value++;
+	}
+
+	counter.value = 0;
+
+	counter();
+	counter();
+	counter();
+	counter();
+
+	console.log(counter.value);
+
+```
