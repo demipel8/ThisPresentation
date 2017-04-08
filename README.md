@@ -16,7 +16,9 @@ http://www.quirksmode.org/js/events_order.html
 
 ## Simple example
 
-´´´js
+
+```js
+>>>>>>> c36d78d5b7e894372df471bcd70f3e3323d5a2a4
 var Doorbell = {
   sound: 'beeeeeeep',
   press: function() {
@@ -30,4 +32,22 @@ var event = new Event('pulse_button');
 
 document.addEventListener('pulse_button', Doorbell.press);
 document.dispatchEvent(event);
-´´´
+```
+
+##Itself
+```js
+	function counter() {
+	  this.value++;
+	}
+
+	counter.value = 0;
+
+	counter();
+	counter();
+	counter();
+	counter();
+
+	console.log(counter.value);
+
+```
+
