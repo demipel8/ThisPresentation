@@ -395,4 +395,49 @@ Al enlazar el origen a `is_from`, retornamos una función que estara esperando e
 
 ### `This` en los eventos del DOM
 
-- event bubbling (this en target o currentTarge)
+¿Como afecta `this` a los elementos del DOM?
+
+```js
+function paintRed() {
+   this.style.color = '#cc0000';
+}
+
+element.addEventListener('click', paintRed);
+```
+¿Que pasa cuando asociamos `paintRed` al evento click de un elemento? La función se ejecutara con el contexto de el elemento HTML. Obtendremos el mismo comportamiento de estas formas:
+
+```js
+element.onclick = paintRed;
+element.addEventListener('click',paintRed,false);
+element.onclick = function () {this.style.color = '#cc0000';}
+<element onclick="this.style.color = '#cc0000';">
+```
+
+#### Event Bubbling
+
+Cuando *clickas* en un elemento que esta contenido dentro de otro, se lanzara un evento de `click` en ambos.. Pero, ¿En que orden se lanzaran? Aquí es donde aparece el término *event bubbling*, el primer evento de `click` se lanzara en el elemento que ha sido *clickado* e ira subiendo progesivamente por el DOM hasta llegar al document (bubble up).
+
+Si añadimos varios eventos de `click`, ¿como podemos distiguir quien esta tratando el evento? El objeto *evento* se pasa como parametro a la función de callback que gestiona el evento. En el objeto *evento* entre muchas propiedades se incluyen `target` y `currentTarget`. 
+
+`target` hace referencia al elemento que ha sido clickado, mientras que `currentTarget` referencia el elemento que esta procesando el evento, que coincide con el `this` de la función de callback.
+
+```js
+var element1 =  document.createElement('button');
+var element2 =  document.createElement('button');
+
+element1.appendChild(element2);
+
+function onClick(e) {
+	console.log(this == e.target);
+	console.log(this == e.currentTarget);
+}
+
+element1.addEventListener('click', onClick);
+element2.addEventListener('click', onClick);
+
+ document.body.appendChild(element1);
+
+ element2.click();
+```
+
+Para `element1` ambas comparaciones seran `true` ya que se ha hecho *click* en el mismo, pero para `element2` solo la segunda recibiremos `true` en la segunda.
