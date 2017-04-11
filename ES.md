@@ -108,6 +108,7 @@ function childScope() {
 
 parentScope(); // => undefined
 ```
+
 Hay varios errores en este código. La llamada `this.childScope()` funciona unicamente debido a la falta del modo estricto. ambas funciones son creadas como globales, por lo tanto son añadidas como métodos del mismo objeto y la llamada de una otra con `this` funciona.
 
 Sin embargo, la intención detras de dicha llamada es referenciar el alcance de *parentScope* en *childScope*, y como hemos comentado antes, no es posible.
@@ -115,3 +116,215 @@ Sin embargo, la intención detras de dicha llamada es referenciar el alcance de 
 entonces...
 
 ## ¿Que es `this`?
+
+Después de ver estos últimos ejemplos podriamos concluir que el `this` de una función no depende de donde ha sido declarada. Y tendriamos razón, `this` no tiene relación con el punto de declaración sino con el momento de invocación.
+
+Cunado una función es invocada, se genera un *contexto de ejecución* (activation record), este contexto contiene información acerca de la el punto donde se lllamo a la función (call-stack), *como* fue invocada, que parametros ha recibido,... Una de las propiedades es la referencia a `this` que sera usada mientras dure la ejecución de la función. un pequeño ejemplo:
+
+```js
+function paco() { 
+	this.name = 'paco';
+	ramon(); // --> punto de invocación de ramon
+} // --> declaración de paco
+
+function ramon() {
+	console.log(this.name); // => paco
+	//...
+} // --> declaración de ramon
+
+paco(); // --> punto de invocación de paco
+```
+
+Una vez sabemos que es `this`, ¿como podemos saber a que hace referencia? Hay 4 casos que podemos tener en cuenta:
+
+### Enlace por defecto
+
+```
+function a_function() {
+	console.log( this.a_variable );
+}
+
+var a_variable = 2;
+
+a_function(); // 2
+```
+
+El primer ejemplo, tiene que ver con ejemplos anteriores. `a_variable` y `a_function` se ha creado como variables globales. En `a_function` usamos `this` el cual hace uso del enlace por defecto y llama a la propiedad `a_variable` del objeto global, el cual retorna 2. hay que tener en cuenta que si se usara el modo estricto, la referencia a `this` referenciara a undefined y no al global, por lo que saltara un error.
+
+### Enlace implícito
+
+Otra regla a considerar es si el punto de invocación tiene objeto de contexto, tambien referido como "esta contenido por un objeto":
+
+```
+function greet(){
+	console.log(this.greeting);
+}
+
+var man = {
+	greeting: 'Hi!',
+	greet: greet
+}
+
+man.greet();
+```
+
+La función `greet` es declarada primero y posteriormente añadida como una referencia del objeto `man`. Independientemente de si es declarada en el objeto o fuera, podemos decir que la función esta "contenida" por el objeto `man`.
+
+En el momento que se llama a `greet`, este esta precedido por una referencia al objeto `man`, enlazando el contexto de `man` al `this` de `greet`. Como `man` es el `this` de greet, decir `this.greeting` es sinonimo de `man.greeting`.  
+
+#### Perder el `this` de forma implícita
+
+ Uno de los errores más comunes es el sucedido en el primer ejemplo de la presentación:
+ 
+ 
+```js
+var man = {
+	greeting: 'Hi!',
+	greet: function() {
+		console.log(this.greeting);
+	}
+}
+
+var manGreeting = man.greet;
+
+manGreeting(); // => undefined
+```
+
+Al crear la variable `manGreeting` pasamos la referencia de la función `greet`, pero perdemos la referencia a `man` que teniamos al ejecutar `man.greet`. `manGreeting` en este caso hara uso del caso anterior *enlace por defecto*, por lo que `this` hara referencia al global, el cual devolvera `undefined` al no tener la propiedad `greeting`.
+
+### Enlace explícito
+
+Con el *enlace implícito* hemos tenido que modificar el objeto en cuestión para incluir una referencia en el mismo de la función, y usar esta propiedad para referencia de forma indirectar el `this` al objeto.
+
+Pero ¿Como podemos forzar a una función a usar un objecto de nuestra elección como su `this`, añadir la function como una propiedad de dicho objeto? Para ayudarnos a conseguir nuestro objetivo tenemos los metodos *apply* y *call* que todas las funciones que creemos poseen. Ambas funciones aceptan como primer paramétro un objeto para ser usado como `this` de la función al ser ejecutada.
+
+```js
+var man = {
+	greeting: 'Hi!'
+}
+
+var boy = {
+	greeting: 'Wazaaaaaaaa!!!!'
+}
+
+function greet() {
+	console.log(this.greeting);
+}
+
+greet.call(man); // => 'Hi!'
+greet.call(boy); // => 'Wazaaaaaaaa!!!!'
+```
+*call* y *apply* se comportan igual en lo que a `this` se refiere, la diferencia reside en como tratan el resto de parametros 
+
+```js
+function logFullName(name, surname) {
+	console.log(name + ' ' + surname);
+}
+
+logFullName.call(null, 'pepito', 'palotes'); // => 'pepito palotes'
+logFullName.apply(null, ['pepito', 'palotes']);  // => 'pepito palotes'
+```
+
+Desgraciadamente este solución por si sola no nos libra de perder el `this` de forma implícita. Para ello tenemos que *forzar* el enlace explícito
+
+```js
+function a_function() {
+	console.log( this.a_varaiable );
+}
+
+var an_object = {
+	a_varaiable: 2
+};
+
+var another_function = function() {
+	a_function.call( an_object );
+};
+
+another_function(); // => 2
+setTimeout( another_function, 100 ); // => 2
+another_function.call( window ); // => 2
+```
+
+Aunque `another_function` use *call* para cambiar su contexto de ejecución, `a_function` seguira usando `an_object` como `this`, ya que forzamos el enlace en la declaracion de `another_function`. Este patrón es tan común, que en ES5 se añadio al lenguaje el metodo `bind`.
+
+```js
+var another_function = function() {
+	a_function.call( an_object );
+}
+	
+var another_function = a_function.bind( an_object );
+};
+```
+
+`bind` devuelve una function que es una referencia a la original con su `this` enlazado al objeto especificado.
+
+#### "Contextos" En APIs
+
+Muchas funciones incluyen un parametro opcional "context", que esta diseñado como un work-around para que no tengas que usar `bind` para asignar un `this` particular.
+
+```js
+function is_a(el) {
+	console.log( el + " is a " + this.id );
+}
+
+var role = {
+	id: "student"
+};
+
+["Paco", "Manel", "Leo", "Raul"].forEach( is_a, role ); // Paco is a student Manel is a student Leo is a student Raul is a student
+```
+### Enlace con `new`
+
+Cuarto y último caso. En los lenguajes que soportan clases, los "constructores" son metodos especiales unidos a las clases. Cuando la clase es instanciada con el operador `new` se llama a el constructor de la clase.
+
+JS tiene el operador `new`, y aunque el código es similar a lo que se ve en ese tipo de lenguajes, no hay una conexión con esa "orientación a clases" en JS. En JS los constructores son funciones normales que son llamadas con el operador `new` delate de ellas. No estan asociadas a clases ni estan instanciando una clase. Ni siquiera son un tipo especial de funciones. Una funcion llamada con el operador `new` delante genera una *llamada constructora*. Cuando esto sucede varias cosas son hechas automáticament:
+
+  1. Un objeto nuevo es construido (aka, construido) de la nada
+  2. Al objeto nuevo se le enlaza el [[Prototype]]
+  3. Al objeto nuevo se le asigna a la propiedad `this` una referencia a el mismo
+  4. A no ser que la función retorne un objeto alternativo, la función invocada con `new` automáticamente retorna el objeto nuevo
+  
+Considera este código:
+
+```js
+function Dog(name) {
+	this.name = name;
+}
+
+var whiskey = new Dog( 'whiskey' );
+console.log( whiskey.name ); // => 'whiskey'
+```
+### Orden de prioridad de los casos
+
+  1. new: ¿Ha sido la función llamada con `new`? En ese caso `this` es el nuevo objeto.
+  2. explícito: ¿Ha sido la función llamada con *call*, *apply* o se ha definido con *bind*? Entonces `this` es el objeto especificado explícitamente
+  3. implícito: ¿Ha sido la función llamada con un contexto? pues `this` hace referencia al objeto del contexto
+  4. defecto: en modo estricto: undefined, en otro caso `this` hara referencia al objeto global
+ 
+### `this` léxico
+ 
+En **ES6** se introdujo un tipo de función que no sigue estas 4 reglas. Las funciones flecha (arrow-functions) no usan la palabra reservada *function* sino que usan el operador conocido como *fat-arrow* (fleach gorda) `=>`. Estas funciones enlazan en el `this` el alcance de la funcion que las envuelven.
+
+```js
+function generator() {
+	return (a_parameter) => {
+		console.log( this.a_variable );
+	};
+}
+
+var an_object = {
+	a_variable: 2
+};
+
+var another_object = {
+	a_variable: 3
+};
+
+var bar = generator.call( an_object ); 
+bar.call( another_object ); // => 2
+```
+La *arrow-function* creada en `generator` captura el `this` de `generator` en el momento en que se llamo.
+
+
+ - currying
+- event bubbling (this en target o currentTarge)
