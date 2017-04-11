@@ -325,6 +325,74 @@ bar.call( another_object ); // => 2
 ```
 La *arrow-function* creada en `generator` captura el `this` de `generator` en el momento en que se llamo.
 
+## Otros usos para `this`
 
- - currying
+Veamos algunos ejemplos del uso de this.
+
+### Currying o Currificación
+
+La currificación es una técnica que consiste en transformar una función que utiliza múltiples argumentos en una secuencia de funciones que utilizan un único argumento.
+
+```js
+function again(verb, noun, adjective) {
+	console.log('lets ' + verb + ' ' + noun + ' ' + adjective + ' again!!!');
+}
+
+console.log(again('fish', 'cookies', 'awesomely'));
+```
+
+Tenemos la función `again` que recibe 3 parametros e imprime por consola una fras generada a partir de ellos. Curryfiquemos la function
+
+```js
+function curryedAgain(verb) {
+	return function(noun) {
+		return function(adjective) {
+			again(verb, noun, adjective);
+		}
+	}
+}
+
+var fish = curryedAgain('fish');
+//...
+
+var fishedCookies = fish('cookies');
+//...
+
+fishedCookies('awesomely');
+```
+
+De esta forma podemos ir proveyendo los parametros en diferentes puntos de ejecución. un ejemplo de currying con `this` puede ser el siguiente:
+
+```js
+var members = [
+	{ name: 'Manel', origin : 'Barcelona' },
+	{ name: 'Raul', origin : 'Valencia' },
+	{ name: 'Demi', origin : 'Valencia' }
+];
+
+var is_from = function(origin, member) {
+	return member.origin == origin;
+}
+
+var fromValencia = members.filter(function(member) {
+	return is_from('Valencia', member);
+});
+
+console.log(fromValencia);
+```
+
+Usamos una función de filtro para seleccionar los miembros que son de *valencia*, sin embardo la función que le pasamos a filtrado no es muy legible, vamos a mejorarlo un poco con `this`.
+
+```js
+var membersFrom = function(origin) {
+	return is_from.bind(null, origin);
+}
+
+var fromValencia = members.filter(membersFrom('Valencia'));
+```
+
+Al enlazar el origen a `is_from`, retornamos una función que estara esperando el parametro `member`, que le proveera la función filter al invocarlo.
+
+### `This` en los eventos del DOM
+
 - event bubbling (this en target o currentTarge)
