@@ -1,6 +1,6 @@
 # This en JS
 
-A día de hoy podemos argumentar que JavaScript es el lenguaje de programación del mundo, el que mas hype tiene seguro.
+A día de hoy podemos argumentar que JavaScript es el lenguaje de programación más usado del mundo, el que mas hype tiene seguro.
 
 Es un lenguaje que cuenta con más de 21 años de edad. Que requiere retrocompatibilidad con sus antiguas versiones y con cuatro grandes motores de distintas empresas compitiendo por tener la mejor implementación (google, microsoft, apple y mozilla).
 
@@ -119,7 +119,7 @@ entonces...
 
 Después de ver estos últimos ejemplos podriamos concluir que el `this` de una función no depende de donde ha sido declarada. Y tendriamos razón, `this` no tiene relación con el punto de declaración sino con el momento de invocación.
 
-Cunado una función es invocada, se genera un *contexto de ejecución* (activation record), este contexto contiene información acerca de la el punto donde se lllamo a la función (call-stack), *como* fue invocada, que parametros ha recibido,... Una de las propiedades es la referencia a `this` que sera usada mientras dure la ejecución de la función. un pequeño ejemplo:
+Cuando una función es invocada, se genera un *contexto de ejecución* (activation record), este contexto contiene información acerca de la el punto donde se lllamo a la función (call-stack), *como* fue invocada, que parametros ha recibido,... Una de las propiedades es la referencia a `this` que sera usada mientras dure la ejecución de la función. un pequeño ejemplo:
 
 ```js
 function paco() { 
@@ -139,7 +139,7 @@ Una vez sabemos que es `this`, ¿como podemos saber a que hace referencia? Hay 4
 
 ### Enlace por defecto
 
-```
+```js
 function a_function() {
 	console.log( this.a_variable );
 }
@@ -155,7 +155,7 @@ El primer ejemplo, tiene que ver con ejemplos anteriores. `a_variable` y `a_func
 
 Otra regla a considerar es si el punto de invocación tiene objeto de contexto, tambien referido como "esta contenido por un objeto":
 
-```
+```js
 function greet(){
 	console.log(this.greeting);
 }
@@ -212,7 +212,7 @@ function greet() {
 }
 
 greet.call(man); // => 'Hi!'
-greet.call(boy); // => 'Wazaaaaaaaa!!!!'
+greet.apply(boy); // => 'Wazaaaaaaaa!!!!'
 ```
 *call* y *apply* se comportan igual en lo que a `this` se refiere, la diferencia reside en como tratan el resto de parametros 
 
@@ -253,7 +253,6 @@ var another_function = function() {
 }
 	
 var another_function = a_function.bind( an_object );
-};
 ```
 
 `bind` devuelve una function que es una referencia a la original con su `this` enlazado al objeto especificado.
@@ -296,7 +295,7 @@ console.log( whiskey.name ); // => 'whiskey'
 ```
 ### Orden de prioridad de los casos
 
-  1. new: ¿Ha sido la función llamada con `new`? En ese caso `this` es el nuevo objeto.
+  1. new: ¿Ha sido la función llamada con `new`? En ese caso `this` es el nuevo objeto
   2. explícito: ¿Ha sido la función llamada con *call*, *apply* o se ha definido con *bind*? Entonces `this` es el objeto especificado explícitamente
   3. implícito: ¿Ha sido la función llamada con un contexto? pues `this` hace referencia al objeto del contexto
   4. defecto: en modo estricto: undefined, en otro caso `this` hara referencia al objeto global

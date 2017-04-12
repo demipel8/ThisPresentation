@@ -24,30 +24,485 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>
-					<h1>This in JS</h1>
-					<p>by Demi</p>
+				<section data-background-color="#f0db4f" data-background="images/js-logo.png" data-background-size="contain" data-background-position="right">
+					<h1>This in</h1>
+					<aside class="notes">
+						- Más de 21 años. 
+						- Requiere retrocompatibilidad
+						- 4 grandes motores compitiendo (google, microsoft, apple y mozilla).
+						- Estandarizado a través del estándar ECMA-262, toda la comunidad interviene
+						- presente en todo tipo de dispositivos
+						- VR, AR, Videojuegos, cosas inimaginables para els
+						- Podemos argumentar que JS es el lenguaje de programación más usado del mundo
+					</aside>
+				</section>
+				<section data-background="images/hype-train.jpg">
+					<aside class="notes">
+						- Almenos el que mas hype tiene seguro.
+						- Batallita Scheme, Java?
+						- resultado de ese bagaje: confusiones si no se conoce. THIS UN CLARO EJEMPLO
+					</aside>
 				</section>
 				<section>
-					<h2>Lets see a few examples</h2>
-				</section>
-				<section>
-				    <h2>Pretty Code</h2>
 					<pre><code class="hljs" data-trim contenteditable>
-						function counter() {
-						  this.value++;
+						var man = {
+							greeting: 'Hi!',
+							greet: function() {
+								console.log(this.greeting);
+							}
 						}
 
-						counter.value = 0;
-
-						counter();
-						counter();
-						counter();
-						counter();
-
-						console.log(counter.value);
+						man.greet();
 					</code></pre>
+
+          <pre class="fragment"><code class="hljs" data-trim>'Hi!'</code></pre>
+
+           <aside class="notes">
+            - Explica Codigo
+            - muestra resultado
+            ¿Como se comportaria la función de saludo si decidimos asignarla a una variable diferente?
+            </aside>
 				</section>
+
+        <section>
+          <pre><code class="hljs" data-trim contenteditable>
+            var man = {
+              greeting: 'Hi!',
+              greet: function() {
+                console.log(this.greeting);
+              }
+            }
+
+            var manGreeting = man.greet;
+
+            manGreeting();
+          </code></pre>
+
+          <pre class="fragment"><code class="hljs" data-trim>undefined</code></pre>
+
+           <aside class="notes">
+            - Explica Codigo
+            - muestra resultado
+            ¿Como se comportaria la función de saludo si decidimos asignarla a una variable diferente?
+            </aside>
+        </section>
+        <section data-background="images/wtf.jpeg"></section>
+        <section data-background="images/im-out.gif"></section>
+        <section data-background="images/myself.jpg">
+          <aside class="notes">
+            Un asociación inicial comun es pensar que se refiere a un función en sí. Muchos desarrolladores nuevos en JS piensan que referenciar un función como un objeto te permiter guardar el estado entre las diferentes llamadas. 
+          </aside>
+        </section>
+        <section>
+          <pre><code class="hljs" data-trim contenteditable>
+            var proxy = function() {
+              this.timesCalled++;
+
+              //...
+            }
+
+            proxy.timesCalled = 0;
+
+            proxy();
+            proxy();
+            proxy();
+            proxy();
+
+            console.log(proxy.timesCalled);
+          </code></pre>
+
+          <pre class="fragment"><code class="hljs" data-trim>0</code></pre>
+          <pre class="fragment"><code class="hljs" data-trim>Uncaught TypeError: Cannot read property 'timesCalled' of undefined at proxy</code></pre>
+
+           <aside class="notes">
+            ¿después de llamar 5 veces a la función proxy el contador este a 0?
+            ¿Por qué no ha saltado ningún error?
+            El problema reside en una interpretación muy literal de this en la sentencia this.timesCalled++
+            explicar this no esta apuntando a proxy.
+            variable global llamada timesCalled cuyo valor es NaN.
+            Con strict peta
+            </aside>
+        </section>
+        <section>
+          <h1>Su alcance</h1>
+          <p><i>El alcance es el contexto en el cual ciertos valores y expresiones son "visibles", o pueden ser referenciados. Si una variable o otra expresión no estan "en el alcance actual", no estan disponibles para su uso. Los alcances pueden estar ordenados en una jerarquia, de modo que los hijos pueden acceder al alcance de los padres, pero no viceversa.</i></p>
+        </section>
+        <section>
+          <pre><code class="hljs" data-trim>
+            function parentScope() {
+              var parentVariable = 'Parent scope';
+
+              function childScope() {
+                var childVariable =  'Child scope'
+
+                console.log(parentVariable); \\ => 'Parent scope'
+              }
+
+              childScope();
+              console.log(childVariable); \\ => 'ReferenceError: childVariable is not defined'
+            }
+
+            parentScope();
+          </code></pre>
+          <aside class="notes">
+            Otro error común es asumir que this hace referencia al alcance de la función. La respuesta es, no. El "objeto" alcance no es accesible desde el código JS, es una parte interna de la implementación del motor. 
+          </aside>
+        </section>
+        <section>
+           <pre><code class="hljs" data-trim>
+              function parentScope() {
+                var fatherVariable = 2;
+                this.childScope();
+              }
+
+              function childScope() {
+                console.log( this.a );
+              }
+
+              parentScope();
+          </code></pre>
+          <pre class="fragment"><code class="hljs" data-trim>undefined</code></pre>
+          <aside class="notes">
+            - Hay varios errores en este código. La llamada this.childScope() funciona unicamente debido a la falta del modo estricto. 
+            - No existe forma de hacer ese puente de scope.
+          </aside>
+        </section>
+        <section data-background="images/grandma-finds-the-internet.jpg">
+          <aside class="notes">
+            podriamos pensar que el this de una función no depende de donde ha sido declarada. Y tendriamos razón, this no tiene relación con el punto de declaración sino con el momento de invocación.
+
+            Cuando una función es invocada, se genera un contexto de ejecución, este contexto contiene información acerca de la el punto donde se lllamo a la función, como fue invocada, que parametros ha recibido,... Una de las propiedades es la referencia a this que sera usada mientras dure la ejecución de la función. 
+          </aside>
+        </section>
+        <section>
+          <pre><code class="hljs" data-trim>
+              function paco() { 
+                this.name = 'paco';
+                ramon(); // --> punto de invocación de ramon
+              } // --> declaración de paco
+
+              function ramon() {
+                console.log(this.name); // => paco
+                //...
+              } // --> declaración de ramon
+
+              paco(); // --> punto de invocación de paco
+          </code></pre>
+          <aside class="notes">
+          Una vez sabemos que es this, ¿como podemos saber a que hace referencia? Hay 4 casos que podemos tener en cuenta
+          </aside>
+        </section>
+        <section>
+          <h2>Enlace por defecto</h2>
+          <pre><code class="hljs" data-trim>
+            function a_function() {
+              console.log( this.a_variable );
+            }
+
+            var a_variable = 2;
+
+            a_function(); // 2
+          </code></pre>
+          <aside class="notes">
+            a_variable y a_function se ha creado como variables globales.
+            si se usara el modo estricto, la referencia a this referenciara a undefined y no al global, por lo que saltara un error.
+          </aside>
+        </section>
+        <section>
+          <h2>Enlace implícito</h2>
+          <pre><code class="hljs" data-trim>
+            function greet(){
+              console.log(this.greeting);
+            }
+
+            var man = {
+              greeting: 'Hi!',
+              greet: greet
+            }
+
+            man.greet();
+          </code></pre>
+          <aside class="notes">
+           podemos decir que la función esta "contenida" por el objeto man.
+
+           En el momento que se llama a greet, este esta precedido por una referencia al objeto man, enlazando el contexto de man al this de greet. Como man es el this de greet, decir this.greeting es sinonimo de man.greeting.
+
+           se puede perder la referencia facilmente.
+          </aside>
+        </section>
+        <section>
+          <pre><code class="hljs" data-trim>
+            var man = {
+              greeting: 'Hi!',
+              greet: function() {
+                console.log(this.greeting);
+              }
+            }
+
+            var manGreeting = man.greet;
+
+            manGreeting(); 
+          </code></pre>
+          <pre class="fragment"><code class="hljs" data-trim>undefined</code></pre>
+          <aside class="notes">
+           Perder el this de forma implícita. Ooops
+          </aside>
+        </section>
+        <section data-background="images/big-oops.jpg"></section>
+        <section>
+          <h2>Enlace explícito</h2>
+          <pre><code class="hljs" data-trim>
+            var man = {
+              greeting: 'Hi!'
+            }
+
+            var boy = {
+              greeting: 'Wazaaaaaaaa!!!!'
+            }
+
+            function greet() {
+              console.log(this.greeting);
+            }
+
+            greet.call(man); // => 'Hi!'
+            greet.apply(boy); // => 'Wazaaaaaaaa!!!!'
+          </code></pre>
+          <aside class="notes">
+            Explicar call y apply, pa que sirve primer parametro de ellos. diferencias? siguiente traspa
+          </aside>
+        </section>
+        <section>
+          <pre><code class="hljs" data-trim>
+            function logFullName(name, surname) {
+              console.log(name + ' ' + surname);
+            }
+
+            logFullName.call(null, 'pepito', 'palotes'); // => 'pepito palotes'
+            logFullName.apply(null, ['pepito', 'palotes']);  // => 'pepito palotes'
+          </code></pre>
+          <aside class="notes">
+            Desgraciadamente este solución por si sola no nos libra de perder el this de forma implícita. Para ello tenemos que forzar el enlace explícito
+          </aside>
+        </section>
+        <section>
+          <pre><code class="hljs" data-trim>
+            function a_function() {
+              console.log( this.a_varaiable );
+            }
+
+            var an_object = {
+              a_varaiable: 2
+            };
+
+            var another_function = function() {
+              a_function.call( an_object );
+            };
+
+            another_function(); // => 2
+            setTimeout( another_function, 100 ); // => 2
+            another_function.call( window ); // => 2
+          </code></pre>
+           <pre class="fragment"><code class="hljs" data-trim>
+            var another_function = a_function.bind( an_object );
+           </code></pre>
+          <aside class="notes">
+            a_function seguira usando an_object como this, ya que forzamos el enlace en la declaracion de another_function. Este patrón es tan común, que en ES5 se añadio al lenguaje el metodo bind.
+          </aside>
+        </section>
+        <section>
+          <h2>"Contextos" En APIs</h2>
+          <pre><code class="hljs" data-trim>
+            function is_a(el) {
+              console.log( el + " is a " + this.id );
+            }
+
+            var role = {
+              id: "student"
+            };
+
+            ["Paco", "Manel", "Leo", "Raul"].forEach( is_a, role ); 
+            // Paco is a student 
+            // Manel is a student 
+            // Leo is a student 
+            // Raul is a student
+          </code></pre>
+          <aside class="notes">
+           explica variable context en estos metodos
+           en muchas librerias nativas
+           en muchas librerias de terceros
+          </aside>
+        </section>
+        <section data-background="images/new.jpg">
+          <pre class="fragment"><code class="hljs" data-trim>
+            var whiskey = new Beverage( 'whiskey' );
+          </code></pre>
+          <aside class="notes">
+           En los lenguajes que soportan clases, los "constructores" son metodos especiales unidos a las clases. Cuando la clase es instanciada con el operador new se llama a el constructor de la clase.
+
+           ¡¡METER FRAGMENT!!
+
+            JS tiene el operador new, y aunque el código es similar a lo que se ve en ese tipo de lenguajes, no hay una conexión con esa "orientación a clases" en JS. En JS los constructores son funciones normales que son llamadas con el operador new delate de ellas. No estan asociadas a clases ni estan instanciando una clase. Ni siquiera son un tipo especial de funciones. Una funcion llamada con el operador new delante genera una llamada constructora. Cuando esto sucede varias cosas son hechas automáticament:
+          </aside>
+        </section>
+         <section>
+          <h2>Enlace con new</h2>
+          <pre><code class="hljs" data-trim>
+            function Dog(name) {
+              this.name = name;
+            }
+
+            var whiskey = new Dog( 'whiskey' );
+            console.log( whiskey.name ); // => 'whiskey'
+          </code></pre>
+
+          <aside class="notes">
+            1.Un objeto nuevo es construido (aka, construido) de la nada
+            2.Al objeto nuevo se le enlaza el [[Prototype]]
+            3.Al objeto nuevo se le asigna a la propiedad this una referencia a el mismo
+            4.A no ser que la función retorne un objeto alternativo, la función invocada con new automáticamente retorna el objeto nuevo
+          </aside>
+        </section>
+        <section>
+         <h3>Orden de prioridad de los casos</h3>
+         <ol>
+          <li><b>new</b>: ¿Ha sido la función llamada con new? En ese caso this es el nuevo objeto</li>
+          <li><b>explícito</b>: ¿Ha sido la función llamada con call, apply o se ha definido con bind? Entonces this es el objeto especificado explícitamente</li>
+          <li><b>implícito</b>: ¿Ha sido la función llamada con un contexto? pues this hace referencia al objeto del contexto</li>
+          <li><b>defecto</b>: en modo estricto: undefined, en otro caso this hara referencia al objeto global</li>
+         </ol>
+        </section>
+        <section>
+          <h2>this léxico</h2>
+          <pre><code class="hljs" data-trim>
+            function generator() {
+              return (a_parameter) => {
+                console.log( this.a_variable );
+              };
+            }
+
+            var an_object = {
+              a_variable: 2
+            };
+
+            var another_object = {
+              a_variable: 3
+            };
+
+            var bar = generator.call( an_object ); 
+            bar.call( another_object ); // => 2
+          </code></pre>
+
+          <aside class="notes">
+            En ES6 se introdujo un tipo de función que no sigue estas 4 reglas. Las funciones flecha (arrow-functions) no usan la palabra reservada function sino que usan el operador conocido como fat-arrow (fleach gorda) =>. Estas funciones enlazan en el this el alcance de la funcion que las envuelven.
+          </aside>
+        </section>
+        <section data-background="images/realization.gif"></section>
+        <section data-background="images/chuck-ok.gif">
+           <aside class="notes">
+            Vamos con un par de casos de uso de this
+          </aside>
+        </section>
+        <section data-background="images/curry.jpg">
+          <aside class="notes">
+            La currificación es una técnica que consiste en transformar una función que utiliza múltiples argumentos en una secuencia de funciones que utilizan un único argumento.
+          </aside>
+        </section>
+        <section>
+          <pre><code class="hljs" data-trim>
+            function again(verb, noun, adjective) {
+              console.log('lets ' + verb + ' ' + noun + ' ' + adjective + ' again!!!');
+            }
+
+            console.log(again('fish', 'cookies', 'awesomely'));
+          </code></pre>
+           <pre class="fragment"><code class="hljs" data-trim>
+            function curryedAgain(verb) {
+              return function(noun) {
+                return function(adjective) {
+                  again(verb, noun, adjective);
+                }
+              }
+            }
+
+            var fish = curryedAgain('fish');
+            //...f
+            var fishedCookies = fish('cookies');
+            //...
+            fishedCookies('awesomely');
+          </code></pre>
+        </section>
+        <section>
+          <pre><code class="hljs" data-trim>
+            var members = [
+              { name: 'Manel', origin : 'Barcelona' },
+              { name: 'Raul', origin : 'Valencia' },
+              { name: 'Demi', origin : 'Valencia' }
+            ];
+
+            var is_from = function(origin, member) {
+              return member.origin == origin;
+            }
+
+            var fromValencia = members.filter(function(member) {
+              return is_from('Valencia', member);
+            });
+
+            console.log(fromValencia);
+          </code></pre>
+           <pre class="fragment"><code class="hljs" data-trim>
+            var membersFrom = function(origin) {
+              return is_from.bind(null, origin);
+            }
+
+            var fromValencia = members.filter(membersFrom('Valencia'));
+          </code></pre>
+        </section>
+        <section data-background="images/events.jpg"></section>
+        <section>
+          <section>
+          <pre><code class="hljs" data-trim>
+            function paintRed() {
+               this.style.color = '#cc0000';
+            }
+
+            element.addEventListener('click', paintRed);
+          </code></pre>
+           <pre class="fragment"><code class="hljs" data-trim>
+            element.onclick = paintRed;
+            element.addEventListener('click',paintRed,false);
+            element.onclick = function () {this.style.color = '#cc0000';}
+            <element onclick="this.style.color = '#cc0000';"></element>
+          </code></pre>
+        </section>
+        </section>
+        <section data-background="images/bubbles.jpg"></section>
+        <section>
+          <pre><code class="hljs" data-trim>
+            var element1 =  document.createElement('button');
+            var element2 =  document.createElement('button');
+
+            element1.appendChild(element2);
+
+            function onClick(e) {
+              console.log(this == e.target);
+              console.log(this == e.currentTarget);
+            }
+
+            element1.addEventListener('click', onClick);
+            element2.addEventListener('click', onClick);
+
+             document.body.appendChild(element1);
+
+             element2.click();
+          </code></pre>
+        </section>
+         <section>
+          <h1>THANKS!</h1>
+          <p>slides at <a href="https://demipel8.github.io/ThisPresentation/"> GitHub pages</a></p>
+          <p>repo at <a href="https://github.com/demipel8/ThisPresentation">GitHub</a></p>
+          <p>demipel8@gmail.com</p>
+        </section>
+				<section data-background="images/i-know-js.gif"></section>
 			</div>
 		</div>
 
