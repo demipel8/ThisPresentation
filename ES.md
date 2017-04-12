@@ -103,7 +103,7 @@ function parentScope() {
 }
 
 function childScope() {
-	console.log( this.a );
+	console.log( this.fatherVariable );
 }
 
 parentScope(); // => undefined
@@ -262,8 +262,8 @@ var another_function = a_function.bind( an_object );
 Muchas funciones incluyen un parametro opcional "context", que esta diseñado como un work-around para que no tengas que usar `bind` para asignar un `this` particular.
 
 ```js
-function is_a(el) {
-	console.log( el + " is a " + this.id );
+function is_a(name) {
+	console.log( name + " is a " + this.id );
 }
 
 var role = {

@@ -156,7 +156,7 @@
               }
 
               function childScope() {
-                console.log( this.a );
+                console.log( this.fatherVariable );
               }
 
               parentScope();
@@ -312,8 +312,8 @@
         <section>
           <h2>"Contextos" En APIs</h2>
           <pre><code class="hljs" data-trim>
-            function is_a(el) {
-              console.log( el + " is a " + this.id );
+            function is_a(name) {
+              console.log( name + " is a " + this.id );
             }
 
             var role = {
