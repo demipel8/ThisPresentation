@@ -1,12 +1,14 @@
-#Languajes
+# This in JS
+
+## Languajes
 
 Spanish: https://github.com/demipel8/ThisPresentation/blob/master/ES.md
 
-# Events
+## Events
 
-Devscola - run 2017
+Devscola - run 2017 12th April 2015 - https://www.youtube.com/watch?v=DWFEkdJUY4o
 
-# Bibliography
+## Bibliography
 
 https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch1.md
 https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md
@@ -20,7 +22,3 @@ https://www.youtube.com/watch?v=iZLP4qOwY8I&list=PL0zVEGEvSaeEd9hlmCXrk5yUyqUag-
 http://www.quirksmode.org/js/events_order.html
 
 http://tomhicks.github.io/code/2014/08/11/some-of-this.html
-
-#Images
-
-http://ubfriends.net/archive2015/wp-content/uploads/2012/12/Pointing2self.jpg
