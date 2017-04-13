@@ -6,7 +6,7 @@ Spanish: https://github.com/demipel8/ThisPresentation/blob/master/ES.md
 
 ## Events
 
-Devscola - run 2017 12th April 2015 - https://www.youtube.com/watch?v=DWFEkdJUY4o
+Devscola: run 2017 - 12th April 2017 - https://www.youtube.com/watch?v=DWFEkdJUY4o
 
 ## Bibliography
 
