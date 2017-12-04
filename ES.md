@@ -6,7 +6,7 @@ Es un lenguaje que cuenta con más de 21 años de edad. Que requiere retrocompat
 
 Un lenguaje estandarizado a través del estándar ECMA-262, en el cual gente de todas partes de la comunidad interviene para decidir que funcionalidades se añaden o modifican.
 
-Todo este bagaje tiene como resultado un lenguaje particular en algunos aspectos, que puede llevar a confundir si no se conoce bien su funcionamientos. El artefacto `This` es uno de ellos. 
+Todo este bagaje tiene como resultado un lenguaje particular en algunos aspectos, que puede llevar a confundir si no se conoce bien su funcionamiento. El artefacto `This` es uno de ellos.
 
 Veamos un pequeño ejemplo.
 
@@ -69,7 +69,7 @@ console.log(proxy.timesCalled);
 
 Como resultado obtenemos: `0`. ¿Como puede ser que después de llamar 5 veces a la función proxy el contador este a 0?¿Por qué no ha saltado ningún error? El problema reside en una interpretación muy literal de `this` en la sentencia `this.timesCalled++`. Cuando se ejecuta `proxy.timesCalled = 0;` se añade la propiedad *timesCalled* al objeto *proxy*, pero cuando se ejecuta `this.timesCalled++` `this` no esta apuntando a *proxy*.
 
-Entonces, ¿Que contador se ha incrementado? Si indagamos un poco encontraremos que he creado una variable global llamada `timesCalled` cuyo valor es `NaN`. 
+Entonces, ¿Que contador se ha incrementado? Si indagamos un poco encontraremos que he creado una variable global llamada `timesCalled` cuyo valor es `NaN`.
 
 Si hubieramos ejecutado el ejemplo anterior en modo estricto, habriamos recibido un `TypeError` ya que este modo nos evita, entre otras cosas, crear accidentalmente variables globales indeseadas.
 
@@ -122,7 +122,7 @@ Después de ver estos últimos ejemplos podriamos concluir que el `this` de una 
 Cuando una función es invocada, se genera un *contexto de ejecución* (activation record), este contexto contiene información acerca de la el punto donde se lllamo a la función (call-stack), *como* fue invocada, que parametros ha recibido,... Una de las propiedades es la referencia a `this` que sera usada mientras dure la ejecución de la función. un pequeño ejemplo:
 
 ```js
-function paco() { 
+function paco() {
 	this.name = 'paco';
 	ramon(); // --> punto de invocación de ramon
 } // --> declaración de paco
@@ -175,8 +175,8 @@ En el momento que se llama a `greet`, este esta precedido por una referencia al 
 #### Perder el `this` de forma implícita
 
  Uno de los errores más comunes es el sucedido en el primer ejemplo de la presentación:
- 
- 
+
+
 ```js
 var man = {
 	greeting: 'Hi!',
@@ -214,7 +214,7 @@ function greet() {
 greet.call(man); // => 'Hi!'
 greet.apply(boy); // => 'Wazaaaaaaaa!!!!'
 ```
-*call* y *apply* se comportan igual en lo que a `this` se refiere, la diferencia reside en como tratan el resto de parametros 
+*call* y *apply* se comportan igual en lo que a `this` se refiere, la diferencia reside en como tratan el resto de parametros
 
 ```js
 function logFullName(name, surname) {
@@ -251,7 +251,7 @@ Aunque `another_function` use *call* para cambiar su contexto de ejecución, `a_
 var another_function = function() {
 	a_function.call( an_object );
 }
-	
+
 var another_function = a_function.bind( an_object );
 ```
 
@@ -276,13 +276,13 @@ var role = {
 
 Cuarto y último caso. En los lenguajes que soportan clases, los "constructores" son metodos especiales unidos a las clases. Cuando la clase es instanciada con el operador `new` se llama a el constructor de la clase.
 
-JS tiene el operador `new`, y aunque el código es similar a lo que se ve en ese tipo de lenguajes, no hay una conexión con esa "orientación a clases" en JS. En JS los constructores son funciones normales que son llamadas con el operador `new` delate de ellas. No estan asociadas a clases ni estan instanciando una clase. Ni siquiera son un tipo especial de funciones. Una funcion llamada con el operador `new` delante genera una *llamada constructora*. Cuando esto sucede varias cosas son hechas automáticament:
+JS tiene el operador `new`, y aunque el código es similar a lo que se ve en ese tipo de lenguajes, no hay una conexión con esa "orientación a clases" en JS. En JS los constructores son funciones normales que son llamadas con el operador `new` delate de ellas. No estan asociadas a clases ni estan instanciando una clase. Ni siquiera son un tipo especial de funciones. Una funcion llamada con el operador `new` delante genera una *llamada constructora*. Cuando esto sucede varias cosas son hechas de forma automática:
 
   1. Un objeto nuevo es construido (aka, construido) de la nada
   2. Al objeto nuevo se le enlaza el [[Prototype]]
   3. Al objeto nuevo se le asigna a la propiedad `this` una referencia a el mismo
   4. A no ser que la función retorne un objeto alternativo, la función invocada con `new` automáticamente retorna el objeto nuevo
-  
+
 Considera este código:
 
 ```js
@@ -299,9 +299,9 @@ console.log( whiskey.name ); // => 'whiskey'
   2. explícito: ¿Ha sido la función llamada con *call*, *apply* o se ha definido con *bind*? Entonces `this` es el objeto especificado explícitamente
   3. implícito: ¿Ha sido la función llamada con un contexto? pues `this` hace referencia al objeto del contexto
   4. defecto: en modo estricto: undefined, en otro caso `this` hara referencia al objeto global
- 
+
 ### `this` léxico
- 
+
 En **ES6** se introdujo un tipo de función que no sigue estas 4 reglas. Las funciones flecha (arrow-functions) no usan la palabra reservada *function* sino que usan el operador conocido como *fat-arrow* (fleach gorda) `=>`. Estas funciones enlazan en el `this` el alcance de la funcion que las envuelven.
 
 ```js
@@ -319,7 +319,7 @@ var another_object = {
 	a_variable: 3
 };
 
-var bar = generator.call( an_object ); 
+var bar = generator.call( an_object );
 bar.call( another_object ); // => 2
 ```
 La *arrow-function* creada en `generator` captura el `this` de `generator` en el momento en que se llamo.
@@ -416,7 +416,7 @@ element.onclick = function () {this.style.color = '#cc0000';}
 
 Cuando *clickas* en un elemento que esta contenido dentro de otro, se lanzara un evento de `click` en ambos.. Pero, ¿En que orden se lanzaran? Aquí es donde aparece el término *event bubbling*, el primer evento de `click` se lanzara en el elemento que ha sido *clickado* e ira subiendo progesivamente por el DOM hasta llegar al document (bubble up).
 
-Si añadimos varios eventos de `click`, ¿como podemos distiguir quien esta tratando el evento? El objeto *evento* se pasa como parametro a la función de callback que gestiona el evento. En el objeto *evento* entre muchas propiedades se incluyen `target` y `currentTarget`. 
+Si añadimos varios eventos de `click`, ¿como podemos distiguir quien esta tratando el evento? El objeto *evento* se pasa como parametro a la función de callback que gestiona el evento. En el objeto *evento* entre muchas propiedades se incluyen `target` y `currentTarget`.
 
 `target` hace referencia al elemento que ha sido clickado, mientras que `currentTarget` referencia el elemento que esta procesando el evento, que coincide con el `this` de la función de callback.
 
